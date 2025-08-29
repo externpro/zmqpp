@@ -11,10 +11,10 @@
 #
 
 
-cmake_minimum_required(VERSION 2.8.12...3.21)
+cmake_minimum_required(VERSION 2.8.12...3.31)
 project(zmqpp)
 enable_testing()
-include(flags OPTIONAL)
+include(xpflags)
 
 # prepare C++11
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
