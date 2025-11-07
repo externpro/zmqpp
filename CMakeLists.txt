@@ -12,6 +12,7 @@
 
 
 cmake_minimum_required(VERSION 2.8.12...3.31)
+set(CMAKE_PROJECT_TOP_LEVEL_INCLUDES .devcontainer/cmake/xproinc.cmake)
 project(zmqpp)
 enable_testing()
 include(xpflags)
@@ -246,18 +247,20 @@ endif()
 
 
 include(GNUInstallDirs)
+if(NOT DEFINED XP_INSTALL_CMAKEDIR)
+  set(XP_INSTALL_CMAKEDIR ${CMAKE_INSTALL_DATADIR}/cmake)
+endif()
+set(targetsFile ${PROJECT_NAME}-targets)
+xpPackageDevel(TARGETS_FILE ${targetsFile} LIBRARIES ${nSpace}zmqpp-static)
 # Install
 # -------
 install(TARGETS ${INSTALL_TARGET_LIST}
-        EXPORT ${PROJECT_NAME}-targets
+        EXPORT ${targetsFile}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-if(NOT DEFINED XP_INSTALL_CMAKEDIR)
-  set(XP_INSTALL_CMAKEDIR ${CMAKE_INSTALL_DATADIR}/cmake)
-endif()
-install(EXPORT ${PROJECT_NAME}-targets ${nameSpace} DESTINATION ${XP_INSTALL_CMAKEDIR})
+install(EXPORT ${targetsFile} ${nameSpace} DESTINATION ${XP_INSTALL_CMAKEDIR})
 
 install(DIRECTORY src/zmqpp DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         FILES_MATCHING PATTERN "*.hpp")
