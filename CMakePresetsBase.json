@@ -4,7 +4,11 @@
     {
       "name": "config-base",
       "hidden": true,
-      "binaryDir": "${sourceDir}/_bld-${presetName}"
+      "binaryDir": "${sourceDir}/_bld-${presetName}",
+      "cacheVariables": {
+        "ZMQPP_BUILD_SHARED": "false",
+        "XP_NAMESPACE": "xpro"
+      }
     }
   ],
   "buildPresets": [
