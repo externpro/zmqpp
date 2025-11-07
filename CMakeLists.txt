@@ -12,6 +12,7 @@
 
 
 cmake_minimum_required(VERSION 2.8.12...3.31)
+set(CMAKE_PROJECT_TOP_LEVEL_INCLUDES .devcontainer/cmake/xproinc.cmake)
 project(zmqpp)
 enable_testing()
 include(xpflags)
