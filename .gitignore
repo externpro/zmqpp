@@ -3,3 +3,7 @@ docs
 .cproject
 .project
 .settings
+# externpro
+.env
+_bld*/
+docker-compose.override.yml
