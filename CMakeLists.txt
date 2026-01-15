@@ -242,12 +242,23 @@ if( ZMQPP_BUILD_TESTS )
 endif()
 
 
-include(GNUInstallDirs)
-if(NOT DEFINED XP_INSTALL_CMAKEDIR)
-  set(XP_INSTALL_CMAKEDIR ${CMAKE_INSTALL_DATADIR}/cmake)
-endif()
 set(targetsFile ${PROJECT_NAME}-targets)
-xpPackageDevel(TARGETS_FILE ${targetsFile} LIBRARIES ${nSpace}zmqpp-static)
+if(DEFINED XP_NAMESPACE)
+  # hide the variables that are set by externpro
+  mark_as_advanced(ZMQPP_LIBZMQ_NAME_STATIC ZEROMQ_INCLUDE_DIR ZMQPP_LIBZMQ_CMAKE)
+  xpExternPackage(NAMESPACE ${XP_NAMESPACE}
+    TARGETS_FILE ${targetsFile} LIBRARIES zmqpp-static
+    BASE 4.2.0-47 XPDIFF "patch" DEPS libzmq
+    WEB "https://zeromq.github.io/zmqpp/" UPSTREAM "github.com/zeromq/zmqpp"
+    DESC "high-level binding for libzmq"
+    LICENSE "[MPL-2.0](https://github.com/zeromq/zmqpp/blob/develop/LICENSE 'Mozilla Public License 2.0')"
+    )
+  set(nameSpace NAMESPACE ${XP_NAMESPACE}::)
+  set(CMAKE_INSTALL_CMAKEDIR ${XP_INSTALL_CMAKEDIR})
+elseif(NOT DEFINED CMAKE_INSTALL_CMAKEDIR)
+  set(CMAKE_INSTALL_CMAKEDIR ${CMAKE_INSTALL_DATADIR}/cmake)
+endif()
+
 # Install
 # -------
 install(TARGETS ${INSTALL_TARGET_LIST}
@@ -256,7 +267,7 @@ install(TARGETS ${INSTALL_TARGET_LIST}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-install(EXPORT ${targetsFile} ${nameSpace} DESTINATION ${XP_INSTALL_CMAKEDIR})
+install(EXPORT ${targetsFile} ${nameSpace} DESTINATION ${CMAKE_INSTALL_CMAKEDIR})
 
 install(DIRECTORY src/zmqpp DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         FILES_MATCHING PATTERN "*.hpp")
