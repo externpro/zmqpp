@@ -15,7 +15,6 @@ cmake_minimum_required(VERSION 2.8.12...3.31)
 set(CMAKE_PROJECT_TOP_LEVEL_INCLUDES .devcontainer/cmake/xproinc.cmake)
 project(zmqpp)
 enable_testing()
-include(xpflags)
 
 # prepare C++11
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
@@ -51,15 +50,13 @@ set( ZMQPP_BUILD_CLIENT   false   CACHE BOOL "Build the ZMQPP client" )
 set( ZMQPP_BUILD_TESTS    false   CACHE BOOL "Build the ZMQPP tests" )
 
 
-if(DEFINED XP_NAMESPACE)
-  set(nSpace ${XP_NAMESPACE}::)
-  set(nameSpace NAMESPACE ${nSpace})
-endif()
-if(COMMAND xpFindPkg)
-  xpFindPkg(PKGS libzmq)
-  get_target_property(ZEROMQ_INCLUDE_DIR ${nSpace}libzmq-static INTERFACE_INCLUDE_DIRECTORIES)
+if(COMMAND xpFindPkg) # externpro dependency provider
+  find_package(libzmq)
+  set(ZMQPP_LIBZMQ_NAME_STATIC ${LIBZMQ_LIBRARIES})
+  get_target_property(ZEROMQ_INCLUDE_DIR ${ZMQPP_LIBZMQ_NAME_STATIC} INTERFACE_INCLUDE_DIRECTORIES)
   set(ZMQPP_LIBZMQ_CMAKE true)
-else()
+endif()
+
 # Since the current CMake build of ZMQ does not work for generating a dynamic libzmq,
 # give a chance for users to update which ZMQ library to link to
 
@@ -70,7 +67,6 @@ set( ZMQPP_LIBZMQ_NAME_SHARED  "zmq"        CACHE STRING "The ZMQ library to lin
 # Paths to set to look for zmq
 set( ZEROMQ_LIB_DIR       ""      CACHE PATH "The library directory for libzmq" )
 set( ZEROMQ_INCLUDE_DIR   ""      CACHE PATH "The include directory for ZMQ" )
-endif()
 
 # Build flags
 set( IS_TRAVIS_CI_BUILD   true    CACHE BOOL "Defines TRAVIS_CI_BUILD - Should the tests avoid running cases where memory is scarce." )
@@ -132,7 +128,7 @@ if (ZMQPP_BUILD_STATIC)
   else()
     # libzmq-static is the name of the target from
     # libzmq's CMake
-    target_link_libraries(zmqpp-static ${nSpace}libzmq-static)
+    target_link_libraries(zmqpp-static ${ZMQPP_LIBZMQ_NAME_STATIC})
   endif()
   list( APPEND INSTALL_TARGET_LIST zmqpp-static)
   set( LIB_TO_LINK_TO_EXAMPLES zmqpp-static )
@@ -148,7 +144,7 @@ if (ZMQPP_BUILD_SHARED)
   else()
     # libzmq is the name of the target from
     # libzmq's CMake
-    target_link_libraries(zmqpp ${nSpace}libzmq)
+    target_link_libraries(zmqpp ${ZMQPP_LIBZMQ_NAME_SHARED})
   endif()
   list( APPEND INSTALL_TARGET_LIST zmqpp)
   set( LIB_TO_LINK_TO_EXAMPLES zmqpp )
