@@ -11,8 +11,7 @@
 #
 
 
-cmake_minimum_required(VERSION 2.8.12...3.31)
-set(CMAKE_PROJECT_TOP_LEVEL_INCLUDES .devcontainer/cmake/xproinc.cmake)
+cmake_minimum_required(VERSION 2.8.12...4.3)
 project(zmqpp)
 enable_testing()
 
@@ -52,7 +51,7 @@ set( ZMQPP_BUILD_TESTS    false   CACHE BOOL "Build the ZMQPP tests" )
 
 if(COMMAND xpFindPkg) # externpro dependency provider
   find_package(libzmq)
-  set(ZMQPP_LIBZMQ_NAME_STATIC ${LIBZMQ_LIBRARIES})
+  set(ZMQPP_LIBZMQ_NAME_STATIC libzmq::libzmq-static)
   get_target_property(ZEROMQ_INCLUDE_DIR ${ZMQPP_LIBZMQ_NAME_STATIC} INTERFACE_INCLUDE_DIRECTORIES)
   set(ZMQPP_LIBZMQ_CMAKE true)
 endif()
@@ -243,17 +242,17 @@ endif()
 
 
 set(targetsFile ${PROJECT_NAME}-targets)
-if(DEFINED XP_NAMESPACE)
+if(COMMAND xpExternPackage)
   # hide the variables that are set by externpro
   mark_as_advanced(ZMQPP_LIBZMQ_NAME_STATIC ZEROMQ_INCLUDE_DIR ZMQPP_LIBZMQ_CMAKE)
-  xpExternPackage(NAMESPACE ${XP_NAMESPACE}
-    TARGETS_FILE ${targetsFile} LIBRARIES zmqpp-static
-    BASE 4.2.0-47 XPDIFF "patch" DEPS libzmq
+  xpExternPackage(TARGETS_FILE ${targetsFile}
+    LIBRARIES zmqpp-static DEFAULT_TARGETS zmqpp-static
+    BASE 4.2.0-47 XPDIFF "patch"
     WEB "https://zeromq.github.io/zmqpp/" UPSTREAM "github.com/zeromq/zmqpp"
     DESC "high-level binding for libzmq"
     LICENSE "[MPL-2.0](https://github.com/zeromq/zmqpp/blob/develop/LICENSE 'Mozilla Public License 2.0')"
     )
-  set(nameSpace NAMESPACE ${XP_NAMESPACE}::)
+  set(nameSpace NAMESPACE ${PROJECT_NAME}::)
 elseif(NOT DEFINED CMAKE_INSTALL_CMAKEDIR)
   set(CMAKE_INSTALL_CMAKEDIR ${CMAKE_INSTALL_DATADIR}/cmake)
 endif()
